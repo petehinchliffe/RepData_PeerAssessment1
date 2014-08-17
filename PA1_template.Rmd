@@ -2,7 +2,7 @@ Reproducible Research: Peer Assessment 1
 =========================================
 
 ## Loading and preprocessing the data
-The acivity data is loaded from 
+The acivity data is loaded from activity.csv which should be in working directory.
 ```{r}
 activity <- read.csv('activity.csv', stringsAsFactors=FALSE)
 ```
