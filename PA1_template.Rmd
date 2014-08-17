@@ -2,7 +2,7 @@ Reproducible Research: Peer Assessment 1
 =========================================
 
 ## Loading and preprocessing the data
-
+The acivity data is loaded from 
 ```{r}
 activity <- read.csv('activity.csv', stringsAsFactors=FALSE)
 ```
@@ -10,8 +10,12 @@ activity <- read.csv('activity.csv', stringsAsFactors=FALSE)
 ## What is mean total number of steps taken per day?
 ```{r}
 stepsbydate <- aggregate(steps~date,activity,sum,na.rm=TRUE)
-mean(stepsbydate$steps, na.rm=TRUE)
-median(stepsbydate$steps, na.rm=TRUE)
+meanSteps <- mean(stepsbydate$steps, na.rm=TRUE)
+medianSteps <- median(stepsbydate$steps, na.rm=TRUE)
+```
+The mean number of steps is `r meanSteps`
+The median number of steps is `r medianSteps`
+```{r}
 hist(stepsbydate$steps, breaks=20)
 ```
 
@@ -26,6 +30,7 @@ maxInterval <- stepsbyinterval$interval[which.max(stepsbyinterval$steps)]
 The interval with the largest average number of steps was `r maxInterval` which had `r maxSteps` steps on average.
 
 ## Imputing missing values
+The missing values in the activity data will be filled using the mean value of the interval of the missing value. This value has already been calculated for each interval value, and is stored in the stepsbyinterval data. 
 ```{r}
 nmissing = nrow(activity) - nrow(activity[complete.cases(activity),])
 ```
@@ -44,13 +49,16 @@ median(filledstepsbydate$steps, na.rm=TRUE)
 hist(filledstepsbydate$steps, breaks=20)
 ```
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r fig.height=4}
+```{r}
 imputed$weekday <- weekdays(as.Date(imputed$date, "%Y-%m-%d"))
 imputed$isWeekend <- (imputed$weekday == "Saturday" | imputed$weekday == "Sunday")
 weekendStepsbyinterval <- aggregate(steps~interval,imputed[imputed$isWeekend == TRUE,],mean)
 weekdayStepsbyinterval <- aggregate(steps~interval,imputed[imputed$isWeekend == FALSE,],mean)
 
-qplot(interval, steps, data=imputed, geom=c("line"), xlab="Interval", ylab="Steps", main="Activity patterns weekend and weekdays", fill=isWeekend)
-with(weekendStepsbyinterval, plot(interval,steps,type="l", main="Weekend average steps"))
-with(weekdayStepsbyinterval, plot(interval,steps,type="l", main="Weekday average steps"))
+weekendStepsbyinterval$daytype="Weekend"
+weekdayStepsbyinterval$daytype="Weekday"
+
+alldays <- rbind(weekendStepsbyinterval,weekdayStepsbyinterval)
+library(lattice)
+with(alldays,xyplot(steps~interval|daytype,type="l",layout=c(1,3)))
 ```
