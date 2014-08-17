@@ -85,7 +85,29 @@ hist(filledstepsbydate$steps, breaks=20)
 ```
 
 ![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5.png) 
-
-
 ## Are there differences in activity patterns between weekdays and weekends?
 
+```r
+imputed$weekday <- weekdays(as.Date(imputed$date, "%Y-%m-%d"))
+imputed$isWeekend <- (imputed$weekday == "Saturday" | imputed$weekday == "Sunday")
+weekendStepsbyinterval <- aggregate(steps~interval,imputed[imputed$isWeekend == TRUE,],mean)
+weekdayStepsbyinterval <- aggregate(steps~interval,imputed[imputed$isWeekend == FALSE,],mean)
+
+qplot(interval, steps, data=imputed, geom=c("line"), xlab="Interval", ylab="Steps", main="Activity patterns weekend and weekdays", fill=isWeekend)
+```
+
+```
+## Error: could not find function "qplot"
+```
+
+```r
+with(weekendStepsbyinterval, plot(interval,steps,type="l", main="Weekend average steps"))
+```
+
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-61.png) 
+
+```r
+with(weekdayStepsbyinterval, plot(interval,steps,type="l", main="Weekday average steps"))
+```
+
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-62.png) 
